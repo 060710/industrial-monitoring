@@ -256,7 +256,8 @@
                     this.error = null;
                     try {
                         // 使用绝对路径确保部署正确
-                        const response = await fetch('/data/industrial_devices_full.json');
+                        const repoName = 'industrial-monitoring' // 改为你的实际仓库名称
+                        const response = await fetch(`/${repoName}/data/industrial_devices_full.json`)
                         if (!response.ok) throw new Error(`请求失败: ${response.status}`);
                         
                         const rawData = await response.json();
