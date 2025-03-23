@@ -7,8 +7,8 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <link rel="icon" href="data:;base64,iVBORw0KGgo="> <!-- 避免favicon.ico 404错误 -->
     <style>
-        /* 保持原有样式不变 */
         :root {
             --primary-color: #1677ff;
             --success-color: #52c41a;
@@ -103,6 +103,7 @@
             background: #f8f9fa;
             border-radius: 4px;
             overflow: hidden;
+            position: relative;
         }
 
         .btn {
@@ -117,11 +118,70 @@
             background-color: #1677ff;
             color: white;
         }
+
+        /* 加载状态样式 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .error-message {
+            color: var(--error-color);
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--error-color);
+            margin: 20px;
+            border-radius: 4px;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .nav-container {
+                height: auto;
+                padding: 10px 0;
+                flex-wrap: wrap;
+            }
+            
+            .search-box {
+                order: 3;
+                width: 100%;
+                margin: 10px 0;
+            }
+            
+            .device-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .device-model {
+                height: 150px;
+            }
+        }
     </style>
 </head>
 <body>
     <div id="app">
-        <header class="header">
+        <!-- 加载状态 -->
+        <div v-if="loading" class="loading-overlay">
+            <div class="loading-status">
+                ⏳ 数据加载中...
+            </div>
+        </div>
+
+        <!-- 错误提示 -->
+        <div v-if="error" class="error-message">
+            ❌ 加载失败: {{ error }}
+            <button @click="loadData" class="btn btn-primary" style="margin-top:10px;">重试</button>
+        </div>
+
+        <header class="header" v-if="!loading && !error">
             <div class="nav-container">
                 <div class="action-buttons">     
                     <a href="../index.html">
@@ -138,7 +198,7 @@
             </div>
         </header>
 
-        <main class="dashboard">
+        <main class="dashboard" v-if="!loading && !error">
             <div class="device-grid">
                 <div class="device-card" 
                      v-for="device in filteredDevices" 
@@ -150,7 +210,11 @@
                               :class="device.status === '正常' ? 'success' : 'error'">
                         </span>
                     </div>
-                    <div class="device-model" :ref="'modelContainer'+device.id"></div>
+                    <div class="device-model" :ref="'modelContainer'+device.id">
+                        <div v-if="!device.modelLoaded" class="model-placeholder">
+                            🌀 模型加载中...
+                        </div>
+                    </div>
                     <div class="card-body">
                         <p>📍 位置：{{ device.location }}</p>
                         <p>🌡️ 温度：{{ device.sensor_data.temperature }}℃</p>
@@ -168,128 +232,172 @@
         new Vue({
             el: '#app',
             data: {
+                loading: true,
+                error: null,
                 devices: [],
                 searchKeyword: ''
             },
             computed: {
                 filteredDevices() {
-                    const keyword = this.searchKeyword.toLowerCase()
+                    if (!Array.isArray(this.devices)) return [];
+                    const keyword = this.searchKeyword.toLowerCase();
                     return this.devices.filter(device => 
-                        device.device_id.toLowerCase().includes(keyword) ||
-                        device.location.toLowerCase().includes(keyword)
-                    )
+                        (device.device_id || '').toLowerCase().includes(keyword) ||
+                        (device.location || '').toLowerCase().includes(keyword)
+                    );
                 }
             },
             async mounted() {
-                try {
-                    // 从本地JSON文件加载数据
-                    const response = await fetch('../data/industrial_devices_full.json')
-                    if (!response.ok) throw new Error('网络响应异常')
-                    this.devices = await response.json()
-                    this.init3DModels()
-                    window.addEventListener('resize', this.handleResize)
-                } catch (error) {
-                    console.error('数据加载失败:', error)
-                    alert('设备数据加载失败，请检查文件路径')
-                }
-            },
-            beforeDestroy() {
-                window.removeEventListener('resize', this.handleResize)
-                this.cleanUp3D()
+                await this.loadData();
             },
             methods: {
+                async loadData() {
+                    this.loading = true;
+                    this.error = null;
+                    try {
+                        // 使用绝对路径确保部署正确
+                        const response = await fetch('/data/industrial_devices_full.json');
+                        if (!response.ok) throw new Error(`请求失败: ${response.status}`);
+                        
+                        const rawData = await response.json();
+                        
+                        // 处理不同JSON结构
+                        const devicesData = rawData.devices || rawData;
+                        
+                        if (!Array.isArray(devicesData)) {
+                            throw new Error('数据格式错误: 期望数组格式');
+                        }
+                        
+                        // 标准化数据格式
+                        this.devices = devicesData.map(item => ({
+                            id: item.id || Math.random().toString(36).substr(2, 9),
+                            device_id: item.device_id || '未知设备',
+                            status: item.status || '未知状态',
+                            location: item.location || '未指定位置',
+                            device_type: item.device_type || '未知类型',
+                            sensor_data: {
+                                temperature: item.sensor_data?.temperature ?? '--',
+                                vibration: item.sensor_data?.vibration ?? '--'
+                            },
+                            fault_info: {
+                                type: item.fault_info?.type || '无'
+                            },
+                            modelLoaded: false
+                        }));
+                        
+                        this.$nextTick(() => {
+                            this.init3DModels();
+                            window.addEventListener('resize', this.handleResize);
+                        });
+                    } catch (error) {
+                        console.error('数据加载失败:', error);
+                        this.error = error.message;
+                        this.devices = [];
+                    } finally {
+                        this.loading = false;
+                    }
+                },
+
                 init3DModels() {
-                    this.$nextTick(() => {
-                        this.devices.forEach(device => {
-                            const container = this.$refs[`modelContainer${device.id}`]?.[0]
-                            if (container) {
-                                device.threeJS = this.initThreeJS(container, device)
+                    this.devices.forEach(device => {
+                        const container = this.$refs[`modelContainer${device.id}`]?.[0];
+                        if (container) {
+                            try {
+                                device.threeJS = this.initThreeJS(container, device);
+                                device.modelLoaded = true;
+                            } catch (error) {
+                                console.error('3D模型初始化失败:', error);
+                                container.innerHTML = '<div class="model-error">❌ 模型加载失败</div>';
                             }
-                        })
-                    })
+                        }
+                    });
                 },
 
                 initThreeJS(container, device) {
-                    const scene = new THREE.Scene()
+                    const scene = new THREE.Scene();
                     const camera = new THREE.PerspectiveCamera(
                         75,
                         container.clientWidth / container.clientHeight,
                         0.1,
                         1000
-                    )
+                    );
                     
                     const renderer = new THREE.WebGLRenderer({ 
                         antialias: true,
                         alpha: true
-                    })
-                    renderer.setSize(container.clientWidth, container.clientHeight)
-                    container.innerHTML = ''
-                    container.appendChild(renderer.domElement)
+                    });
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+                    container.innerHTML = '';
+                    container.appendChild(renderer.domElement);
 
-                    // 添加基础灯光
-                    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-                    scene.add(ambientLight)
-                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
-                    directionalLight.position.set(5, 5, 5)
-                    scene.add(directionalLight)
+                    // 灯光设置
+                    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+                    scene.add(ambientLight);
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+                    directionalLight.position.set(5, 5, 5);
+                    scene.add(directionalLight);
 
                     // 创建动态几何体
-                    const geometry = new THREE.BoxGeometry()
+                    const geometry = new THREE.BoxGeometry();
                     const material = new THREE.MeshPhongMaterial({ 
                         color: device.status === '正常' ? 0x00ff00 : 0xff0000,
                         transparent: true,
                         opacity: 0.8
-                    })
-                    const cube = new THREE.Mesh(geometry, material)
-                    scene.add(cube)
-                    camera.position.z = 3
+                    });
+                    const cube = new THREE.Mesh(geometry, material);
+                    scene.add(cube);
+                    camera.position.z = 3;
 
-                    // 设置相机控制器
-                    const controls = new THREE.OrbitControls(camera, renderer.domElement)
-                    controls.enableDamping = true
-                    controls.dampingFactor = 0.05
+                    // 控制器设置
+                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+                    controls.enableDamping = true;
+                    controls.dampingFactor = 0.05;
 
                     // 动画循环
                     function animate() {
-                        requestAnimationFrame(animate)
-                        controls.update()
-                        cube.rotation.x += 0.01
-                        cube.rotation.y += 0.01
-                        renderer.render(scene, camera)
+                        requestAnimationFrame(animate);
+                        controls.update();
+                        cube.rotation.x += 0.01;
+                        cube.rotation.y += 0.01;
+                        renderer.render(scene, camera);
                     }
-                    animate()
+                    animate();
 
-                    return { scene, camera, renderer, controls }
+                    return { scene, camera, renderer, controls };
                 },
 
                 handleResize() {
                     this.devices.forEach(device => {
                         if (device.threeJS) {
-                            const container = this.$refs[`modelContainer${device.id}`]?.[0]
-                            if (!container) return
+                            const container = this.$refs[`modelContainer${device.id}`]?.[0];
+                            if (!container) return;
                             
-                            const { camera, renderer } = device.threeJS
-                            camera.aspect = container.clientWidth / container.clientHeight
-                            camera.updateProjectionMatrix()
-                            renderer.setSize(container.clientWidth, container.clientHeight)
+                            const { camera, renderer } = device.threeJS;
+                            camera.aspect = container.clientWidth / container.clientHeight;
+                            camera.updateProjectionMatrix();
+                            renderer.setSize(container.clientWidth, container.clientHeight);
                         }
-                    })
+                    });
                 },
 
                 cleanUp3D() {
                     this.devices.forEach(device => {
                         if (device.threeJS) {
-                            const { renderer, controls } = device.threeJS
-                            renderer.domElement.remove()
-                            controls.dispose()
-                            device.threeJS = null
+                            const { renderer, controls } = device.threeJS;
+                            renderer.domElement.remove();
+                            controls.dispose();
+                            device.threeJS = null;
                         }
-                    })
+                    });
                 },
 
                 showDetail(device) {
-                    alert(`设备详情（演示模式）\nID：${device.id}\n状态：${device.status}`)
+                    alert(`设备详情（演示模式）\nID：${device.id}\n状态：${device.status}`);
                 }
+            },
+            beforeDestroy() {
+                window.removeEventListener('resize', this.handleResize);
+                this.cleanUp3D();
             }
         })
     </script>
