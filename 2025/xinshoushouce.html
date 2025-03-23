@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>新手手册 - 工业设备运维系统</title>
+    <style>
+        :root {
+            --primary-blue: #1677ff;      /* 主色调 */
+            --dark-blue: #0050b3;         /* 深蓝 */
+            --light-blue: #e6f7ff;        /* 浅蓝背景 */
+            --text-dark: rgba(0, 0, 0, 0.85);
+            --text-light: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            font-family: "Microsoft Yahei", sans-serif;
+            background: var(--light-blue);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* 顶部导航 */
+        .header {
+            background: var(--primary-blue);
+            padding: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+
+        /* 内容容器 */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* 章节标题 */
+        .section-title {
+            color: var(--primary-blue);
+            border-bottom: 2px solid var(--primary-blue);
+            padding-bottom: 8px;
+            margin-top: 24px;
+        }
+
+        /* 步骤列表 */
+        .step-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-list li {
+            background: var(--light-blue);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .step-number {
+            background: var(--primary-blue);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        /* 按钮样式 */
+        .action-button {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .action-button:hover {
+            background: var(--dark-blue);
+        }
+        .btn {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background-color: rgb(104, 144, 232);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-blue);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            padding: 0px 50px 0px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>工业设备运维系统 - 新手手册</h1>
+        <div class="action-buttons">     
+            <a href="../index.html">
+            <button class="btn btn-primary" onclick="editProfile()">返回新手界面</button>
+        </a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- 快速入门 -->
+        <div class="section">
+            <h2 class="section-title">1. 快速入门</h2>
+            <ul class="step-list">
+                <li>
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>登录系统</strong><br>
+                        使用工号或扫码登录，选择"新手模式"。
+                    </div>
+                </li>
+                <li>
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>设备绑定</strong><br>
+                        输入设备ID完成绑定。
+                    </div>
+                </li>
+                <li>
+                    <div class="step-number">3</div>
+                    <div>
+                        <strong>界面导航</strong><br>
+                        熟悉三大核心模块：监控、诊断、历史记录。
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 核心功能 -->
+        <div class="section">
+            <h2 class="section-title">2. 核心功能</h2>
+            <ul class="step-list">
+                <li>
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>设备监控</strong><br>
+                        实时查看设备状态，温度 >85℃ 时显示红色警告。
+                    </div>
+                </li>
+                <li>
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>故障诊断</strong><br>
+                        系统自动分析故障原因并提供维修方案。
+                    </div>
+                </li>
+                <li>
+                    <div class="step-number">3</div>
+                    <div>
+                        <strong>AR辅助</strong><br>
+                        使用AR功能定位故障点，查看设备内部结构。
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 安全操作 -->
+        <div class="section">
+            <h2 class="section-title">3. 安全操作</h2>
+            <ul class="step-list">
+                <li>
+                    <div class="step-number">1</div>
+                    <div>
+                        <strong>防护装备</strong><br>
+                        带电作业必须佩戴绝缘手套和护目镜。
+                    </div>
+                </li>
+                <li>
+                    <div class="step-number">2</div>
+                    <div>
+                        <strong>高危操作</strong><br>
+                        涉及设备启停需二级确认：指纹 + 主管授权码。
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 操作按钮 
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="action-button" onclick="startTraining()">开始新手训练</button>
+        </div>
+    </div>
+
+    <script>
+        function startTraining() {
+            alert('新手训练模块开发中，请稍后访问！');
+        }
+    </script>-->
+</body>
+</html>

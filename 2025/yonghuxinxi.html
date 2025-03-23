@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户信息中心</title>
+    <style>
+        :root {
+            --primary-blue: #1677ff;     /* 主蓝 */
+            --dark-blue: #0052cc;        /* 深蓝 */
+            --light-blue: #e6f4ff;       /* 浅蓝 */
+            --text-dark: rgba(0, 0, 0, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: var(--light-blue);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .profile-card {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(22, 119, 255, 0.15);
+            overflow: hidden;
+        }
+
+        .header-section {
+            background: var(--primary-blue);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid white;
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+
+        .user-name {
+            color: white;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .user-title {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 16px;
+        }
+
+        .info-section {
+            padding: 30px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: #f8faff;
+            border-radius: 8px;
+            transition: transform 0.3s;
+        }
+
+        .info-item:hover {
+            transform: translateX(10px);
+        }
+
+        .info-label {
+            width: 80px;
+            color: var(--dark-blue);
+            font-weight: 500;
+        }
+
+        .info-content {
+            color: var(--text-dark);
+            flex: 1;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            padding: 0 30px 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-blue);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary-blue);
+            border: 1px solid var(--primary-blue);
+        }
+
+        .btn-outline:hover {
+            background: var(--light-blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <div class="header-section">
+            <img src="touxiang.png" 
+                 alt="用户头像" 
+                 class="avatar">
+            <h2 class="user-name">张三</h2>
+            <p class="user-title">高级工程师</p>
+        </div>
+
+        <div class="info-section">
+            <div class="info-item">
+                <span class="info-label">邮箱</span>
+                <span class="info-content">zhangsan@tech.com</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">电话</span>
+                <span class="info-content">+86 138-1234-5678</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">部门</span>
+                <span class="info-content">设备运维部</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">地址</span>
+                <span class="info-content">北京市海淀区智能制造园区A栋</span>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="bianjiziliao.html">
+            <button class="btn btn-primary" onclick="editProfile()">编辑资料</button>
+        </a> 
+        <a href="../index.html">
+            <button class="btn btn-primary" onclick="editProfile()">返回新手界面</button>
+        </a>
+            <button class="btn btn-outline" onclick="sendMessage()">发送消息</button>
+        </div>
+    </div>
+
+    <script>
+        //function editProfile() {
+            //alert('即将跳转到编辑页面...\n（演示功能）');
+        //}
+
+        function sendMessage() {
+            const message = prompt('请输入要发送的消息：');
+            if(message) {
+                alert(`消息已发送：\n"${message}"`);
+            }
+        }
+
+        // 动态效果增强
+        document.querySelectorAll('.info-item').forEach(item => {
+            item.addEventListener('mouseover', () => {
+                item.style.backgroundColor = '#f0f7ff';
+            });
+            item.addEventListener('mouseout', () => {
+                item.style.backgroundColor = '#f8faff';
+            });
+        });
+     </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    /* 重置内外边距 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 重置body样式 */
+body {
+  font-family: Arial, sans-serif; /* 设置默认字体 */
+  line-height: 1.5; /* 设置行高 */
+  color: #333; /* 设置默认文本颜色 */
+  background-color: white; /* 设置默认背景颜色 */
+}
+
+/* 重置a标签样式 */
+a {
+  text-decoration: none; /* 去除下划线 */
+  color: inherit; /* 继承父元素的文本颜色 */
+}
+
+/* 重置列表样式 */
+ul,
+ol {
+  list-style: none;
+}
+
+/* 重置图片样式，去除图片底侧空白间隙 */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  vertical-align: middle;
+}
+
+/* 重置表格样式 */
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+/* 重置按钮和输入框样式 */
+button,
+input,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  outline: none;
+}
+
+/* 重置标题标签样式 */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-size: inherit;
+  font-weight: normal;
+}
+    .w{
+        width: 1200px;
+    }
+    li{
+        list-style-type: none;
+    }
+    .xiahuaxian{
+        height: 70px;
+        border-bottom:2px solid rgb(9, 113, 231);
+    }
+    .daohanglan{
+        height: 60px;
+
+        margin: 0px auto;
+        top: 10px;
+        position: relative;
+    }
+    .tubiao{
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        background-color: #fff;
+        left: 5px;
+        top: 5px;
+    }
+    .gongneng{
+        margin: 15px auto;
+        height: 60px;
+    }
+    .gongneng ul li{
+        float: left;
+    }
+    .gongneng ul li a{
+        display: block;
+        height: 60px;
+        line-height: 60px;
+        font-size: 16px;
+        padding: 0px 84px;
+        border-right:1px solid skyblue;
+    }
+    .gongneng ul li a:hover{
+        background-color: #f0f0f0;
+        color: skyblue;
+        transform:translate(0px,-5px);
+        transition: all 0.3s;
+    }
+    .shiping1{
+        height: 600px;
+        background-color: skyblue;
+        margin: 40px auto;
+    }
+    video{
+        width: 100%;
+    }
+
+    .encourage-section {
+    background: #f0f9ff;  /* 浅蓝背景 */
+    border-top: 3px solid #1677ff;  /* 主题蓝 */
+    margin: 120px 0;
+    padding: 30px 20px;
+}
+
+.encourage-content {
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.8;
+}
+.encourage-content h1{
+    font-size: 700;
+}
+
+.encourage-text p {
+    margin: 15px 0;
+    font-size: 16px;
+    color: #333;
+}
+
+.encourage-text ul {
+    padding-left: 25px;
+    margin: 15px 0;
+    list-style: none;
+}
+.encourage-text li::before {
+    content: "▹";
+    color: #1677ff;
+    margin-right: 10px;
+}
+
+.signature {
+    margin-top: 25px;
+    text-align: right;
+    font-style: italic;
+}
+
+</style>
+<body>
+    <div class="xiahuaxian">
+        <div class="w daohanglan">
+            <div class="tubiao">
+                <a href="#">
+                    <img src="logo.png" alt="">
+                </a>
+            </div>
+        </div>
+    </div>  
+    <div class="w gongneng">
+        <ul >
+            <li><a href="2025/xinshoushouce.html"><strong>新手手册</strong></a></li>
+            <li><a href="2025/jiankongshebei.html"><strong>实时设备监控</strong></a></li>
+            <li><a href="2025/guzhangfenxi.html"><strong>故障诊断</strong></a></li>
+            <li><a href="2025/lishijilu.html"><strong>历史数据</strong></a></li>
+            <li><a href="2025/yonghuxinxi.html"><strong>用户信息</strong></a></li>
+        </ul>
+    </div>
+    <div class="w shiping1">
+       <video src="shipin.mp4" autoplay="autoplay" muted="muted" controls="controls"></video>
+    </div>
+<section class="encourage-section">
+    <div class="encourage-content">
+        <h1>致踏上征程的工业守护者</h1>
+        <div class="encourage-text">
+            <p>🔧 每一个经验丰富的工程师都曾是新手中的一员</p>
+            <p>💡 您正在操作的不仅是设备，更是中国智造的未来</p>
+            <p>🌟 系统将全程记录您的成长轨迹——今天的操作日志，就是明天的专家手册</p>
+            <p>🚀 遇到挑战时请记得：</p>
+            <ul>
+                <li>智能诊断系统是您的数字助手</li>
+                <li>AR模拟训练室是您的安全沙盒</li>
+                <li>专家知识库是您的云端导师</li>
+            </ul>
+            <p>⚙️ 每一次参数调整都在积累经验，每一次故障排查都在创造价值</p>
+        </div>
+        <div class="signature">
+            <p>—— 智能运维团队与您共同成长</p>
+        </div>
+    </div>
+</section>
+
+</body>
+</html>

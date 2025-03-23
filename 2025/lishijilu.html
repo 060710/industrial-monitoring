@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备历史记录管理系统</title>
+    <style>
+        :root {
+            --primary-blue: #1890ff;
+            --dark-blue: #0050b3;
+            --light-blue: #e6f7ff;
+            --text-dark: rgba(0, 0, 0, 0.85);
+            --text-light: #ffffff;
+            --border-radius: 8px;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* 头部样式 */
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            padding: 8px 16px;
+            border: 1px solid var(--primary-blue);
+            border-radius: var(--border-radius);
+            width: 300px;
+            transition: box-shadow 0.3s;
+        }
+
+        .search-box:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+        }
+
+        /* 过滤栏样式 */
+        .filter-bar {
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        input[type="date"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            min-width: 180px;
+        }
+
+        /* 历史记录卡片 */
+        .history-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .history-card:hover {
+            transform: translateX(5px);
+        }
+
+        .history-item {
+            display: grid;
+            grid-template-columns: 150px 1fr 120px 120px;
+            gap: 16px;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        /* 状态标签 */
+        .status-tag {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            text-align: center;
+            width: fit-content;
+        }
+
+        .success { background: #f6ffed; border: 1px solid #b7eb8f; color: #52c41a; }
+        .warning { background: #fffbe6; border: 1px solid #ffe58f; color: #faad14; }
+        .error { background: #fff2f0; border: 1px solid #ffccc7; color: #ff4d4f; }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 24px;
+            width: 80%;
+            max-width: 800px;
+            border-radius: var(--border-radius);
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 24px;
+            top: 24px;
+            cursor: pointer;
+            font-size: 24px;
+            color: #666;
+        }
+
+        /* 空状态提示 */
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        /* 按钮样式 */
+        button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+
+        .export-bar {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            flex: 1;
+            padding: 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--dark-blue);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            padding: 0px 50px 0px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .history-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="history-header">
+            <div class="action-buttons">     
+                <a href="../index.html">
+                    <button class="btn btn-primary" onclick="editProfile()">返回新手界面</button>
+                </a>
+                </div>
+            <h1>设备操作历史记录</h1>
+            <input type="text" 
+                   class="search-box" 
+                   placeholder="搜索设备ID或操作类型">
+        </div>
+
+        <div class="filter-bar">
+            <input type="date" id="startDate">
+            <span>至</span>
+            <input type="date" id="endDate">
+            <button onclick="applyDateFilter()" style="background: var(--primary-blue); color: white;">筛选</button>
+        </div>
+
+        <div class="export-bar">
+            <button onclick="exportCSV()" style="background: #28a745; color: white;">导出CSV</button>
+            <button onclick="exportExcel()" style="background: #218838; color: white;">导出Excel</button>
+        </div>
+
+        <div id="historyList"></div>
+    </div>
+
+    <!-- 详情模态框 -->
+    <div id="detailModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalBody">
+                <h2 id="deviceTitle"></h2>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>设备型号：</label>
+                        <span id="model"></span>
+                    </div>
+                    <div class="info-item">
+                        <label>最后操作时间：</label>
+                        <span id="lastOperation"></span>
+                    </div>
+                </div>
+                <div id="operationLogs"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script>
+        // 模拟数据
+        const historyData = [
+            {
+                time: "2024-03-15 09:30",
+                device: "离心泵-001",
+                operation: "启动设备",
+                status: "success",
+                detail: {
+                    model: "Pump-X2000",
+                    logs: [
+                        { time: "09:30:00", operator: "张三", action: "启动设备" },
+                        { time: "09:35:00", operator: "系统", action: "进入正常运行" }
+                    ]
+                }
+            },
+            {
+                time: "2024-03-15 10:15",
+                device: "电机-002",
+                operation: "温度预警",
+                status: "warning",
+                detail: {
+                    model: "Motor-Z500",
+                    logs: [
+                        { time: "10:15:00", operator: "系统", action: "温度达到85℃" },
+                        { time: "10:20:00", operator: "李四", action: "检查冷却系统" }
+                    ]
+                }
+            }
+        ];
+
+        // 初始化
+        function init() {
+            renderHistory(historyData);
+            setupEventListeners();
+            initDateFilters();
+        }
+
+        // 事件监听
+        function setupEventListeners() {
+            document.querySelector('.search-box').addEventListener('input', handleSearch);
+            window.addEventListener('scroll', handleScroll);
+        }
+
+        // 初始化日期筛选
+        function initDateFilters() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+            document.getElementById('endDate').value = today;
+        }
+
+        // 渲染历史记录
+        function renderHistory(data) {
+            const container = document.getElementById('historyList');
+            container.innerHTML = data.length ? 
+                data.map(item => `
+                    <div class="history-card">
+                        <div class="history-item">
+                            <div class="time">${item.time}</div>
+                            <div>
+                                <div>${item.device}</div>
+                                <div style="color:#666;font-size:14px">${item.operation}</div>
+                            </div>
+                            <div class="status-tag ${item.status}">
+                                ${getStatusText(item.status)}
+                            </div>
+                            <button onclick="showDetail('${item.device}')" 
+                                    style="background:var(--primary-blue);color:white">
+                                详情
+                            </button>
+                        </div>
+                    </div>
+                `).join('') : 
+                '<div class="empty-state">暂无相关记录</div>';
+        }
+
+        // 状态文本转换
+        function getStatusText(status) {
+            const statusMap = { success: '成功', warning: '警告', error: '错误' };
+            return statusMap[status] || '未知';
+        }
+
+        // 日期筛选
+        function applyDateFilter() {
+            const start = document.getElementById('startDate').value;
+            const end = document.getElementById('endDate').value;
+            
+            const filtered = historyData.filter(item => {
+                const itemDate = new Date(item.time.split(' ')[0]);
+                const startDate = start ? new Date(start) : null;
+                const endDate = end ? new Date(end) : null;
+                
+                return (!start || itemDate >= startDate) && 
+                       (!end || itemDate <= endDate);
+            });
+            
+            renderHistory(filtered);
+        }
+
+        // 搜索功能
+        function handleSearch(e) {
+            const keyword = e.target.value.toLowerCase();
+            const filtered = historyData.filter(item =>
+                item.device.toLowerCase().includes(keyword) ||
+                item.operation.toLowerCase().includes(keyword)
+            );
+            renderHistory(filtered);
+        }
+
+        // 显示详情模态框
+        async function showDetail(deviceId) {
+            const modal = document.getElementById('detailModal');
+            try {
+                // 模拟API调用
+                const data = historyData.find(d => d.device === deviceId)?.detail;
+                
+                document.getElementById('deviceTitle').textContent = deviceId;
+                document.getElementById('model').textContent = data?.model || '未知型号';
+                document.getElementById('lastOperation').textContent = data?.logs[0]?.time || '未知';
+                
+                const logsHTML = data?.logs.map(log => `
+                    <div style="margin: 10px 0; padding: 8px; background: #f8f9fa; border-radius: 4px;">
+                        <span style="color: #666;">[${log.time}]</span>
+                        ${log.operator} ${log.action}
+                    </div>
+                `).join('') || '<div>暂无详细日志</div>';
+                
+                document.getElementById('operationLogs').innerHTML = logsHTML;
+                modal.style.display = 'block';
+            } catch (error) {
+                console.error('加载详情失败:', error);
+                modal.style.display = 'block';
+                document.getElementById('operationLogs').innerHTML = 
+                    `<div class="error">数据加载失败：${error.message}</div>`;
+            }
+        }
+
+        // 关闭模态框
+        function closeModal() {
+            document.getElementById('detailModal').style.display = 'none';
+        }
+
+        // 导出CSV
+        function exportCSV() {
+            if (!confirm('确定要导出CSV文件吗？')) return;
+            
+            const csvContent = [
+                "时间,设备,操作,状态",
+                ...historyData.map(item => 
+                    `"${item.time}","${item.device}","${item.operation}","${getStatusText(item.status)}"`
+                )
+            ].join("\n");
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `设备历史_${new Date().toISOString().slice(0,10)}.csv`;
+            link.click();
+        }
+
+        // 导出Excel
+        function exportExcel() {
+            if (!confirm('确定要导出Excel文件吗？')) return;
+            
+            const worksheet = XLSX.utils.json_to_sheet(historyData.map(item => ({
+                "时间": item.time,
+                "设备": item.device,
+                "操作": item.operation,
+                "状态": getStatusText(item.status)
+            })));
+
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "历史记录");
+            XLSX.writeFile(workbook, `设备历史_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        // 初始化执行
+        init();
+    </script>
+</body>
+</html>

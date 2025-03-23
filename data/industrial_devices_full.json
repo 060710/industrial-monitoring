@@ -1,0 +1,873 @@
+{
+"devices":[
+  {
+    "device_id": "离心泵-1",
+    "device_type": "离心泵",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 21:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "temperature": 97,
+      "vibration": 0.34,
+      "current": 10.2,
+      "pressure": 387
+    },
+    "fault_info": {
+      "code": "F4479",
+      "type": "轴承过热",
+      "severity": "低",
+      "solution": "停机冷却并更换润滑剂",
+      "occur_count": 1
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-11-02",
+        "action": "停机冷却并更换润滑剂",
+        "result": "部分成功",
+        "cost": 1052.54
+      }
+    ]
+  },
+  {
+    "device_id": "离心泵-2",
+    "device_type": "离心泵",
+    "location": "A车间-产线1",
+    "timestamp": "2025-03-14 07:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "temperature": 79,
+      "vibration": 0.47,
+      "current": 12.8,
+      "pressure": 328
+    },
+    "fault_info": {
+      "code": "F8193",
+      "type": "轴承过热",
+      "severity": "高",
+      "solution": "停机冷却并更换润滑剂",
+      "occur_count": 1
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-10-01",
+        "action": "停机冷却并更换润滑剂",
+        "result": "成功",
+        "cost": 3021.13
+      }
+    ]
+  },
+  {
+    "device_id": "离心泵-3",
+    "device_type": "离心泵",
+    "location": "A车间-产线1",
+    "timestamp": "2025-03-14 13:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "temperature": 80,
+      "vibration": 0.11,
+      "current": 10.4,
+      "pressure": 313
+    },
+    "fault_info": {
+      "code": "F8782",
+      "type": "密封泄漏",
+      "severity": "中",
+      "solution": "更换机械密封件",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-11-04",
+        "action": "更换机械密封件",
+        "result": "失败",
+        "cost": 764.81
+      },
+      {
+        "date": "2024-08-23",
+        "action": "更换机械密封件",
+        "result": "部分成功",
+        "cost": 933.06
+      }
+    ]
+  },
+  {
+    "device_id": "离心泵-4",
+    "device_type": "离心泵",
+    "location": "A车间-产线1",
+    "timestamp": "2025-03-14 12:57:41",
+    "status": "正常",
+    "sensor_data": {
+      "temperature": 93,
+      "vibration": 0.09,
+      "current": 12.4,
+      "pressure": 320
+    },
+    "fault_info": {},
+    "maintenance_history": []
+  },
+  {
+    "device_id": "离心泵-5",
+    "device_type": "离心泵",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 00:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "temperature": 72,
+      "vibration": 0.37,
+      "current": 12.7,
+      "pressure": 324
+    },
+    "fault_info": {
+      "code": "F2212",
+      "type": "密封泄漏",
+      "severity": "高",
+      "solution": "更换机械密封件",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-07-27",
+        "action": "更换机械密封件",
+        "result": "失败",
+        "cost": 4674.04
+      },
+      {
+        "date": "2024-11-09",
+        "action": "更换机械密封件",
+        "result": "失败",
+        "cost": 4832.63
+      }
+    ]
+  },
+  {
+    "device_id": "离心泵-6",
+    "device_type": "离心泵",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 13:57:41",
+    "status": "正常",
+    "sensor_data": {
+      "temperature": 70,
+      "vibration": 0.23,
+      "current": 10.4,
+      "pressure": 343
+    },
+    "fault_info": {},
+    "maintenance_history": []
+  },
+  {
+    "device_id": "三相电机-1",
+    "device_type": "三相电机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 22:57:41",
+    "status": "正常",
+    "sensor_data": {
+      "voltage": 361.2,
+      "current": 28.5,
+      "rpm": 1439,
+      "bearing_temp": 85
+    },
+    "fault_info": {},
+    "maintenance_history": []
+  },
+  {
+    "device_id": "三相电机-2",
+    "device_type": "三相电机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 14:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "voltage": 382.6,
+      "current": 28.9,
+      "rpm": 1423,
+      "bearing_temp": 73
+    },
+    "fault_info": {
+      "code": "F2284",
+      "type": "绕组短路",
+      "severity": "高",
+      "solution": "更换绝缘材料并重绕线圈",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-10-20",
+        "action": "更换绝缘材料并重绕线圈",
+        "result": "失败",
+        "cost": 1646.06
+      },
+      {
+        "date": "2024-04-15",
+        "action": "更换绝缘材料并重绕线圈",
+        "result": "失败",
+        "cost": 2495.6
+      }
+    ]
+  },
+  {
+    "device_id": "三相电机-3",
+    "device_type": "三相电机",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 19:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "voltage": 382.3,
+      "current": 24.2,
+      "rpm": 1461,
+      "bearing_temp": 94
+    },
+    "fault_info": {
+      "code": "F6196",
+      "type": "电压不稳",
+      "severity": "低",
+      "solution": "检查供电线路并安装稳压器",
+      "occur_count": 1
+    },
+    "maintenance_history": [
+      {
+        "date": "2025-02-16",
+        "action": "检查供电线路并安装稳压器",
+        "result": "成功",
+        "cost": 934.86
+      }
+    ]
+  },
+  {
+    "device_id": "三相电机-4",
+    "device_type": "三相电机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 16:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "voltage": 361.3,
+      "current": 23.8,
+      "rpm": 1447,
+      "bearing_temp": 77
+    },
+    "fault_info": {
+      "code": "F1885",
+      "type": "绕组短路",
+      "severity": "高",
+      "solution": "更换绝缘材料并重绕线圈",
+      "occur_count": 3
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-10-14",
+        "action": "更换绝缘材料并重绕线圈",
+        "result": "部分成功",
+        "cost": 2213.32
+      },
+      {
+        "date": "2025-02-03",
+        "action": "更换绝缘材料并重绕线圈",
+        "result": "失败",
+        "cost": 1388.77
+      },
+      {
+        "date": "2024-07-28",
+        "action": "更换绝缘材料并重绕线圈",
+        "result": "成功",
+        "cost": 2882.13
+      }
+    ]
+  },
+  {
+    "device_id": "三相电机-5",
+    "device_type": "三相电机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 10:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "voltage": 362.7,
+      "current": 25.6,
+      "rpm": 1477,
+      "bearing_temp": 80
+    },
+    "fault_info": {
+      "code": "F3829",
+      "type": "电压不稳",
+      "severity": "中",
+      "solution": "检查供电线路并安装稳压器",
+      "occur_count": 3
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-12-20",
+        "action": "检查供电线路并安装稳压器",
+        "result": "失败",
+        "cost": 1322.63
+      },
+      {
+        "date": "2025-03-10",
+        "action": "检查供电线路并安装稳压器",
+        "result": "成功",
+        "cost": 2138.03
+      },
+      {
+        "date": "2025-02-19",
+        "action": "检查供电线路并安装稳压器",
+        "result": "部分成功",
+        "cost": 3282.04
+      }
+    ]
+  },
+  {
+    "device_id": "三相电机-6",
+    "device_type": "三相电机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 13:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "voltage": 389.9,
+      "current": 21.3,
+      "rpm": 1409,
+      "bearing_temp": 84
+    },
+    "fault_info": {
+      "code": "F5797",
+      "type": "电压不稳",
+      "severity": "高",
+      "solution": "检查供电线路并安装稳压器",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-08-28",
+        "action": "检查供电线路并安装稳压器",
+        "result": "部分成功",
+        "cost": 4897.9
+      },
+      {
+        "date": "2024-09-21",
+        "action": "检查供电线路并安装稳压器",
+        "result": "失败",
+        "cost": 1546.96
+      }
+    ]
+  },
+  {
+    "device_id": "工业风机-1",
+    "device_type": "工业风机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 01:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "vibration_x": 0.25,
+      "vibration_y": 0.75,
+      "wind_speed": 12,
+      "power": 28.3
+    },
+    "fault_info": {
+      "code": "F1797",
+      "type": "叶片失衡",
+      "severity": "低",
+      "solution": "进行动平衡校正",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-03-14",
+        "action": "进行动平衡校正",
+        "result": "失败",
+        "cost": 2357.3
+      },
+      {
+        "date": "2024-06-12",
+        "action": "进行动平衡校正",
+        "result": "成功",
+        "cost": 4434.42
+      }
+    ]
+  },
+  {
+    "device_id": "工业风机-2",
+    "device_type": "工业风机",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 21:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "vibration_x": 0.58,
+      "vibration_y": 0.54,
+      "wind_speed": 10,
+      "power": 19.9
+    },
+    "fault_info": {
+      "code": "F6298",
+      "type": "轴承疲劳",
+      "severity": "高",
+      "solution": "更换轴承并检查润滑系统",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-05-27",
+        "action": "更换轴承并检查润滑系统",
+        "result": "成功",
+        "cost": 4404.81
+      },
+      {
+        "date": "2025-02-21",
+        "action": "更换轴承并检查润滑系统",
+        "result": "失败",
+        "cost": 3017.84
+      }
+    ]
+  },
+  {
+    "device_id": "工业风机-3",
+    "device_type": "工业风机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 05:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "vibration_x": 0.51,
+      "vibration_y": 0.36,
+      "wind_speed": 10,
+      "power": 19.7
+    },
+    "fault_info": {
+      "code": "F8705",
+      "type": "异物堵塞",
+      "severity": "高",
+      "solution": "清理风道并加装过滤网",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-04-11",
+        "action": "清理风道并加装过滤网",
+        "result": "成功",
+        "cost": 2558.14
+      },
+      {
+        "date": "2024-08-30",
+        "action": "清理风道并加装过滤网",
+        "result": "部分成功",
+        "cost": 3914.08
+      }
+    ]
+  },
+  {
+    "device_id": "工业风机-4",
+    "device_type": "工业风机",
+    "location": "A车间-产线1",
+    "timestamp": "2025-03-14 16:57:41",
+    "status": "正常",
+    "sensor_data": {
+      "vibration_x": 0.48,
+      "vibration_y": 0.38,
+      "wind_speed": 14,
+      "power": 22.3
+    },
+    "fault_info": {},
+    "maintenance_history": []
+  },
+  {
+    "device_id": "工业风机-5",
+    "device_type": "工业风机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 22:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "vibration_x": 0.13,
+      "vibration_y": 0.77,
+      "wind_speed": 14,
+      "power": 18.1
+    },
+    "fault_info": {
+      "code": "F4923",
+      "type": "轴承疲劳",
+      "severity": "中",
+      "solution": "更换轴承并检查润滑系统",
+      "occur_count": 1
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-11-28",
+        "action": "更换轴承并检查润滑系统",
+        "result": "部分成功",
+        "cost": 3169.67
+      }
+    ]
+  },
+  {
+    "device_id": "工业风机-6",
+    "device_type": "工业风机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 01:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "vibration_x": 0.12,
+      "vibration_y": 0.35,
+      "wind_speed": 9,
+      "power": 23.8
+    },
+    "fault_info": {
+      "code": "F9977",
+      "type": "叶片失衡",
+      "severity": "中",
+      "solution": "进行动平衡校正",
+      "occur_count": 1
+    },
+    "maintenance_history": [
+      {
+        "date": "2025-03-12",
+        "action": "进行动平衡校正",
+        "result": "失败",
+        "cost": 3117.94
+      }
+    ]
+  },
+  {
+    "device_id": "空压机-1",
+    "device_type": "空压机",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 21:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "exhaust_temp": 86,
+      "oil_pressure": 0.5,
+      "runtime": 1610
+    },
+    "fault_info": {
+      "code": "F7999",
+      "type": "润滑油污染",
+      "severity": "高",
+      "solution": "更换油滤和润滑油",
+      "occur_count": 3
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-08-11",
+        "action": "更换油滤和润滑油",
+        "result": "失败",
+        "cost": 3120.87
+      },
+      {
+        "date": "2024-12-15",
+        "action": "更换油滤和润滑油",
+        "result": "失败",
+        "cost": 2155.19
+      },
+      {
+        "date": "2025-01-12",
+        "action": "更换油滤和润滑油",
+        "result": "成功",
+        "cost": 1672.86
+      }
+    ]
+  },
+  {
+    "device_id": "空压机-2",
+    "device_type": "空压机",
+    "location": "A车间-产线1",
+    "timestamp": "2025-03-14 17:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "exhaust_temp": 110,
+      "oil_pressure": 0.6,
+      "runtime": 1945
+    },
+    "fault_info": {
+      "code": "F9289",
+      "type": "排气高温",
+      "severity": "中",
+      "solution": "清洗散热器并检查冷却风扇",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-04-03",
+        "action": "清洗散热器并检查冷却风扇",
+        "result": "部分成功",
+        "cost": 4325.54
+      },
+      {
+        "date": "2024-06-30",
+        "action": "清洗散热器并检查冷却风扇",
+        "result": "部分成功",
+        "cost": 610.42
+      }
+    ]
+  },
+  {
+    "device_id": "空压机-3",
+    "device_type": "空压机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 00:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "exhaust_temp": 108,
+      "oil_pressure": 0.7,
+      "runtime": 696
+    },
+    "fault_info": {
+      "code": "F1635",
+      "type": "排气高温",
+      "severity": "低",
+      "solution": "清洗散热器并检查冷却风扇",
+      "occur_count": 3
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-08-13",
+        "action": "清洗散热器并检查冷却风扇",
+        "result": "部分成功",
+        "cost": 1365.19
+      },
+      {
+        "date": "2024-05-14",
+        "action": "清洗散热器并检查冷却风扇",
+        "result": "成功",
+        "cost": 4776.49
+      },
+      {
+        "date": "2024-03-23",
+        "action": "清洗散热器并检查冷却风扇",
+        "result": "失败",
+        "cost": 2230.3
+      }
+    ]
+  },
+  {
+    "device_id": "空压机-4",
+    "device_type": "空压机",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 22:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "exhaust_temp": 114,
+      "oil_pressure": 0.4,
+      "runtime": 695
+    },
+    "fault_info": {
+      "code": "F5502",
+      "type": "润滑油污染",
+      "severity": "低",
+      "solution": "更换油滤和润滑油",
+      "occur_count": 3
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-07-31",
+        "action": "更换油滤和润滑油",
+        "result": "失败",
+        "cost": 3806.04
+      },
+      {
+        "date": "2024-05-19",
+        "action": "更换油滤和润滑油",
+        "result": "成功",
+        "cost": 4076.16
+      },
+      {
+        "date": "2025-02-18",
+        "action": "更换油滤和润滑油",
+        "result": "成功",
+        "cost": 4783.26
+      }
+    ]
+  },
+  {
+    "device_id": "空压机-5",
+    "device_type": "空压机",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 18:57:41",
+    "status": "正常",
+    "sensor_data": {
+      "exhaust_temp": 107,
+      "oil_pressure": 0.3,
+      "runtime": 1407
+    },
+    "fault_info": {},
+    "maintenance_history": []
+  },
+  {
+    "device_id": "空压机-6",
+    "device_type": "空压机",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 08:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "exhaust_temp": 115,
+      "oil_pressure": 0.6,
+      "runtime": 602
+    },
+    "fault_info": {
+      "code": "F9520",
+      "type": "排气高温",
+      "severity": "中",
+      "solution": "清洗散热器并检查冷却风扇",
+      "occur_count": 3
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-04-18",
+        "action": "清洗散热器并检查冷却风扇",
+        "result": "成功",
+        "cost": 4322.46
+      },
+      {
+        "date": "2024-07-01",
+        "action": "清洗散热器并检查冷却风扇",
+        "result": "部分成功",
+        "cost": 1511.82
+      },
+      {
+        "date": "2024-07-26",
+        "action": "清洗散热器并检查冷却风扇",
+        "result": "部分成功",
+        "cost": 1306.73
+      }
+    ]
+  },
+  {
+    "device_id": "传送带-1",
+    "device_type": "传送带",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 13:57:41",
+    "status": "正常",
+    "sensor_data": {
+      "tension": 863,
+      "speed": 2.4,
+      "motor_current": 9.9
+    },
+    "fault_info": {},
+    "maintenance_history": []
+  },
+  {
+    "device_id": "传送带-2",
+    "device_type": "传送带",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 19:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "tension": 1086,
+      "speed": 1.8,
+      "motor_current": 8.0
+    },
+    "fault_info": {
+      "code": "F5633",
+      "type": "负载过重",
+      "severity": "低",
+      "solution": "优化物料分布并检查驱动电机",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-08-27",
+        "action": "优化物料分布并检查驱动电机",
+        "result": "部分成功",
+        "cost": 863.75
+      },
+      {
+        "date": "2024-10-15",
+        "action": "优化物料分布并检查驱动电机",
+        "result": "部分成功",
+        "cost": 1179.15
+      }
+    ]
+  },
+  {
+    "device_id": "传送带-3",
+    "device_type": "传送带",
+    "location": "B车间-产线2",
+    "timestamp": "2025-03-14 08:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "tension": 991,
+      "speed": 2.8,
+      "motor_current": 7.3
+    },
+    "fault_info": {
+      "code": "F7473",
+      "type": "滚筒卡死",
+      "severity": "中",
+      "solution": "清理异物并润滑轴承",
+      "occur_count": 2
+    },
+    "maintenance_history": [
+      {
+        "date": "2024-04-07",
+        "action": "清理异物并润滑轴承",
+        "result": "失败",
+        "cost": 1477.99
+      },
+      {
+        "date": "2024-09-27",
+        "action": "清理异物并润滑轴承",
+        "result": "失败",
+        "cost": 2206.08
+      }
+    ]
+  },
+  {
+    "device_id": "传送带-4",
+    "device_type": "传送带",
+    "location": "A车间-产线1",
+    "timestamp": "2025-03-14 06:57:41",
+    "status": "正常",
+    "sensor_data": {
+      "tension": 1009,
+      "speed": 2.5,
+      "motor_current": 8.7
+    },
+    "fault_info": {},
+    "maintenance_history": []
+  },
+  {
+    "device_id": "传送带-5",
+    "device_type": "传送带",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 01:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "tension": 1141,
+      "speed": 2.3,
+      "motor_current": 6.3
+    },
+    "fault_info": {
+      "code": "F7593",
+      "type": "滚筒卡死",
+      "severity": "中",
+      "solution": "清理异物并润滑轴承",
+      "occur_count": 1
+    },
+    "maintenance_history": [
+      {
+        "date": "2025-02-03",
+        "action": "清理异物并润滑轴承",
+        "result": "部分成功",
+        "cost": 1980.9
+      }
+    ]
+  },
+  {
+    "device_id": "传送带-6",
+    "device_type": "传送带",
+    "location": "仓储区",
+    "timestamp": "2025-03-14 05:57:41",
+    "status": "故障",
+    "sensor_data": {
+      "tension": 808,
+      "speed": 2.2,
+      "motor_current": 6.4
+    },
+    "fault_info": {
+      "code": "F8156",
+      "type": "皮带打滑",
+      "severity": "中",
+      "solution": "调整张紧轮压力",
+      "occur_count": 1
+    },
+    "maintenance_history": [
+      {
+        "date": "2025-02-01",
+        "action": "调整张紧轮压力",
+        "result": "成功",
+        "cost": 989.96
+      }
+    ]
+  }
+]
+}
