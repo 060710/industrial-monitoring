@@ -7,7 +7,7 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo="> <!-- 避免favicon.ico 404错误 -->
+    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         :root {
             --primary-color: #1677ff;
@@ -119,7 +119,6 @@
             color: white;
         }
 
-        /* 加载状态样式 */
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -142,7 +141,45 @@
             border-radius: 4px;
         }
 
-        /* 移动端适配 */
+        .simulation-controls {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .time-slider {
+            width: 300px;
+            margin: 0 10px;
+        }
+
+        .time-display {
+            min-width: 120px;
+            font-weight: bold;
+        }
+
+        .speed-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .simulation-toggle {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
         @media (max-width: 768px) {
             .nav-container {
                 height: auto;
@@ -168,14 +205,10 @@
 </head>
 <body>
     <div id="app">
-        <!-- 加载状态 -->
         <div v-if="loading" class="loading-overlay">
-            <div class="loading-status">
-                ⏳ 数据加载中...
-            </div>
+            <div class="loading-status">⏳ 数据加载中...</div>
         </div>
 
-        <!-- 错误提示 -->
         <div v-if="error" class="error-message">
             ❌ 加载失败: {{ error }}
             <button @click="loadData" class="btn btn-primary" style="margin-top:10px;">重试</button>
@@ -198,6 +231,27 @@
             </div>
         </header>
 
+        <div class="simulation-controls" v-if="!loading && !error">
+            <button class="simulation-toggle" @click="toggleSimulation">
+                {{ isSimulating ? '⏸️ 暂停' : '▶️ 开始' }}
+            </button>
+            <input type="range" 
+                   class="time-slider"
+                   v-model="simulationProgress"
+                   :min="0"
+                   :max="historyData.length - 1"
+                   step="1">
+            <span class="time-display">📅 {{ currentSimulationTime }}</span>
+            <div class="speed-control">
+                <label>速度:</label>
+                <select v-model="simulationSpeed" @change="adjustSpeed">
+                    <option value="1">1x</option>
+                    <option value="2">2x</option>
+                    <option value="5">5x</option>
+                </select>
+            </div>
+        </div>
+
         <main class="dashboard" v-if="!loading && !error">
             <div class="device-grid">
                 <div class="device-card" 
@@ -207,13 +261,10 @@
                     <div class="card-header">
                         <h3>{{ device.device_id }}</h3>
                         <span class="status-indicator" 
-                              :class="device.status === '正常' ? 'success' : 'error'">
-                        </span>
+                              :class="device.status === '正常' ? 'success' : 'error'"></span>
                     </div>
                     <div class="device-model" :ref="'modelContainer'+device.id">
-                        <div v-if="!device.modelLoaded" class="model-placeholder">
-                            🌀 模型加载中...
-                        </div>
+                        <div v-if="!device.modelLoaded" class="model-placeholder">🌀 模型加载中...</div>
                     </div>
                     <div class="card-body">
                         <p>📍 位置：{{ device.location }}</p>
@@ -235,68 +286,108 @@
                 loading: true,
                 error: null,
                 devices: [],
-                searchKeyword: ''
+                searchKeyword: '',
+                isSimulating: false,
+                simulationProgress: 0,
+                simulationSpeed: 1,
+                historyData: [],
+                simulationInterval: null
             },
             computed: {
                 filteredDevices() {
-                    if (!Array.isArray(this.devices)) return [];
                     const keyword = this.searchKeyword.toLowerCase();
                     return this.devices.filter(device => 
                         (device.device_id || '').toLowerCase().includes(keyword) ||
                         (device.location || '').toLowerCase().includes(keyword)
                     );
+                },
+                currentSimulationTime() {
+                    return this.historyData[this.simulationProgress]?.timestamp || '';
                 }
             },
             async mounted() {
                 await this.loadData();
+                this.initHistoryData();
+                window.addEventListener('resize', this.handleResize);
             },
             methods: {
                 async loadData() {
-                    this.loading = true;
-                    this.error = null;
                     try {
-                        // 使用绝对路径确保部署正确
-                        const repoName = 'industrial-monitoring'; // 改为你的实际仓库名称
+                        // 重要修改：根据实际仓库名称修改
+                        const repoName = 'industrial-monitoring'; 
                         const response = await fetch(`/${repoName}/data/industrial_devices_full.json`);
-                        if (!response.ok) throw new Error(`请求失败: ${response.status}`);
                         
+                        if (!response.ok) throw new Error(`请求失败: ${response.status}`);
                         const rawData = await response.json();
                         
-                        // 处理不同JSON结构
-                        const devicesData = rawData.devices || rawData;
-                        
-                        if (!Array.isArray(devicesData)) {
-                            throw new Error('数据格式错误: 期望数组格式');
-                        }
-                        
-                        // 标准化数据格式
-                        this.devices = devicesData.map(item => ({
-                            id: item.id || Math.random().toString(36).substr(2, 9),
-                            device_id: item.device_id || '未知设备',
-                            status: item.status || '未知状态',
-                            location: item.location || '未指定位置',
-                            device_type: item.device_type || '未知类型',
-                            sensor_data: {
-                                temperature: item.sensor_data?.temperature ?? '--',
-                                vibration: item.sensor_data?.vibration ?? '--'
-                            },
-                            fault_info: {
-                                type: item.fault_info?.type || '无'
-                            },
-                            modelLoaded: false
-                        }));
-                        
-                        this.$nextTick(() => {
-                            this.init3DModels();
-                            window.addEventListener('resize', this.handleResize);
-                        });
+                        this.devices = Array.isArray(rawData) ? rawData : rawData.devices;
                     } catch (error) {
-                        console.error('数据加载失败:', error);
-                        this.error = error.message;
-                        this.devices = [];
+                        console.error('真实数据加载失败，启用模拟模式:', error);
+                        this.initHistoryData();
                     } finally {
                         this.loading = false;
                     }
+                },
+
+                initHistoryData() {
+                    const baseTime = Date.now();
+                    this.historyData = Array.from({length: 24}, (_, hour) => ({
+                        timestamp: new Date(baseTime - (24 - hour) * 3600000).toLocaleString(),
+                        devices: this.generateHourlyData(hour)
+                    }));
+                    this.devices = this.historyData[0].devices;
+                },
+
+                generateHourlyData(hour) {
+                    return Array.from({length: 6}, (_, i) => ({
+                        id: `SIM-${hour}-${i}`,
+                        device_id: `设备-${String.fromCharCode(65 + i)}`,
+                        status: (hour + i) % 3 === 0 ? '故障' : '正常',
+                        location: `区域-${(i % 3) + 1}`,
+                        device_type: ['CNC机床', '机械臂', '传送带', '检测仪', '包装机', 'AGV'][i],
+                        sensor_data: {
+                            temperature: 30 + Math.sin(hour/3)*10 + i*2,
+                            vibration: 0.1 + Math.random()*0.5
+                        },
+                        fault_info: {
+                            type: (hour % 4 === 0) ? ['过热', '振动异常', '通讯故障'][i%3] : '无'
+                        }
+                    }));
+                },
+
+                toggleSimulation() {
+                    this.isSimulating = !this.isSimulating;
+                    this.isSimulating ? this.startSimulation() : this.stopSimulation();
+                },
+
+                startSimulation() {
+                    this.simulationInterval = setInterval(() => {
+                        this.simulationProgress = (this.simulationProgress + 1) % this.historyData.length;
+                    }, 1000 / this.simulationSpeed);
+                },
+
+                stopSimulation() {
+                    clearInterval(this.simulationInterval);
+                    this.simulationInterval = null;
+                },
+
+                adjustSpeed() {
+                    if (this.isSimulating) {
+                        this.stopSimulation();
+                        this.startSimulation();
+                    }
+                },
+
+                updateDevices() {
+                    const currentData = this.historyData[this.simulationProgress];
+                    this.devices = currentData.devices.map(d => ({
+                        ...d,
+                        modelLoaded: false
+                    }));
+                    this.$nextTick(() => {
+                        this.cleanUp3D();
+                        this.init3DModels();
+                    });
                 },
 
                 init3DModels() {
@@ -396,11 +487,17 @@
                     alert(`设备详情（演示模式）\nID：${device.id}\n状态：${device.status}`);
                 }
             },
+            watch: {
+                simulationProgress() {
+                    this.updateDevices();
+                }
+            },
             beforeDestroy() {
                 window.removeEventListener('resize', this.handleResize);
+                this.stopSimulation();
                 this.cleanUp3D();
             }
-        })
+        });
     </script>
 </body>
 </html>
