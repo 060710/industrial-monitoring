@@ -7,11 +7,11 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
     <style>
         :root {
             --primary-color: #1677ff;
             --success-color: #52c41a;
+            --warning-color: #faad14;
             --error-color: #ff4d4f;
             --bg-color: #f5f5f5;
             --card-bg: #ffffff;
@@ -31,7 +31,7 @@
         }
 
         .nav-container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
             height: 64px;
             display: flex;
@@ -60,7 +60,7 @@
         }
 
         .dashboard {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 24px auto;
             padding: 0 24px;
         }
@@ -78,6 +78,7 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             transition: transform 0.3s, box-shadow 0.3s;
             cursor: pointer;
+            position: relative;
         }
 
         .device-card:hover {
@@ -94,6 +95,7 @@
         }
 
         .success { background-color: var(--success-color); }
+        .warning { background-color: var(--warning-color); }
         .error { background-color: var(--error-color); }
 
         .device-model {
@@ -103,7 +105,6 @@
             background: #f8f9fa;
             border-radius: 4px;
             overflow: hidden;
-            position: relative;
         }
 
         .btn {
@@ -119,107 +120,90 @@
             color: white;
         }
 
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.9);
+        .status-change {
+            animation: pulse 1.5s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .sensor-value {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sensor-meter {
+            height: 6px;
+            background: #f0f0f0;
+            border-radius: 3px;
+            margin-top: 4px;
+            overflow: hidden;
+        }
+
+        .sensor-meter-fill {
+            height: 100%;
+            transition: width 0.5s;
+        }
+
+        .temp-fill { background: linear-gradient(to right, #52c41a, #faad14, #ff4d4f); }
+        .vib-fill { background: linear-gradient(to right, #52c41a, #faad14); }
+        .press-fill { background: linear-gradient(to right, #52c41a, #1677ff); }
+
+        .last-updated {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .critical-alert {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--error-color);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 999;
-        }
-
-        .error-message {
-            color: var(--error-color);
-            padding: 20px;
-            text-align: center;
-            border: 1px solid var(--error-color);
-            margin: 20px;
-            border-radius: 4px;
-        }
-
-        .simulation-controls {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .time-slider {
-            width: 300px;
-            margin: 0 10px;
-        }
-
-        .time-display {
-            min-width: 120px;
+            font-size: 12px;
             font-weight: bold;
+            animation: pulse 1s infinite;
         }
-
-        .speed-control {
+        
+        .pagination {
             display: flex;
-            align-items: center;
-            gap: 5px;
+            justify-content: center;
+            margin-top: 24px;
+            gap: 8px;
         }
-
-        .simulation-toggle {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 16px;
+        
+        .page-btn {
+            padding: 6px 12px;
+            border: 1px solid #d9d9d9;
             border-radius: 4px;
+            background: white;
             cursor: pointer;
         }
-
-        @media (max-width: 768px) {
-            .nav-container {
-                height: auto;
-                padding: 10px 0;
-                flex-wrap: wrap;
-            }
-            
-            .search-box {
-                order: 3;
-                width: 100%;
-                margin: 10px 0;
-            }
-            
-            .device-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .device-model {
-                height: 150px;
-            }
+        
+        .page-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
         }
     </style>
 </head>
 <body>
     <div id="app">
-        <div v-if="loading" class="loading-overlay">
-            <div class="loading-status">⏳ 数据加载中...</div>
-        </div>
-
-        <div v-if="error" class="error-message">
-            ❌ 加载失败: {{ error }}
-            <button @click="loadData" class="btn btn-primary" style="margin-top:10px;">重试</button>
-        </div>
-
-        <header class="header" v-if="!loading && !error">
+        <header class="header">
             <div class="nav-container">
                 <div class="action-buttons">     
-                    <a href="../index.html">
-                        <button class="btn btn-primary">返回新手界面</button>
-                    </a>
+                    <button class="btn btn-primary">返回新手界面</button>
                 </div>
                 <div class="logo">智能运维平台</div>
                 <div class="search-box">
@@ -231,50 +215,74 @@
             </div>
         </header>
 
-        <div class="simulation-controls" v-if="!loading && !error">
-            <button class="simulation-toggle" @click="toggleSimulation">
-                {{ isSimulating ? '⏸️ 暂停' : '▶️ 开始' }}
-            </button>
-            <input type="range" 
-                   class="time-slider"
-                   v-model="simulationProgress"
-                   :min="0"
-                   :max="historyData.length - 1"
-                   step="1">
-            <span class="time-display">📅 {{ currentSimulationTime }}</span>
-            <div class="speed-control">
-                <label>速度:</label>
-                <select v-model="simulationSpeed" @change="adjustSpeed">
-                    <option value="1">1x</option>
-                    <option value="2">2x</option>
-                    <option value="5">5x</option>
-                </select>
-            </div>
-        </div>
-
-        <main class="dashboard" v-if="!loading && !error">
+        <main class="dashboard">
             <div class="device-grid">
                 <div class="device-card" 
-                     v-for="device in filteredDevices" 
+                     v-for="device in paginatedDevices" 
                      :key="device.id"
-                     @click="showDetail(device)">
+                     @click="showDetail(device)"
+                     :class="{ 'status-change': device.animate }">
+                    <div v-if="device.status === '故障'" class="critical-alert">!</div>
                     <div class="card-header">
                         <h3>{{ device.device_id }}</h3>
                         <span class="status-indicator" 
-                              :class="device.status === '正常' ? 'success' : 'error'"></span>
+                              :class="device.status === '正常' ? 'success' : 
+                                     device.status === '警告' ? 'warning' : 'error'">
+                        </span>
+                        <span>{{ device.status }}</span>
                     </div>
-                    <div class="device-model" :ref="'modelContainer'+device.id">
-                        <div v-if="!device.modelLoaded" class="model-placeholder">🌀 模型加载中...</div>
-                    </div>
+                    <div class="device-model" :ref="'modelContainer'+device.id"></div>
                     <div class="card-body">
                         <p>📍 位置：{{ device.location }}</p>
-                        <p>🌡️ 温度：{{ device.sensor_data.temperature }}℃</p>
                         <p>⚙️ 类型：{{ device.device_type }}</p>
+                        
+                        <div class="sensor-value">
+                            <span>🌡️ 温度：{{ device.sensor_data.temperature }}℃</span>
+                            <span>{{ getTempLevel(device.sensor_data.temperature) }}</span>
+                        </div>
+                        <div class="sensor-meter">
+                            <div class="sensor-meter-fill temp-fill" 
+                                 :style="{ width: getTempPercentage(device.sensor_data.temperature) + '%' }"></div>
+                        </div>
+                        
+                        <div class="sensor-value">
+                            <span>📳 振动：{{ device.sensor_data.vibration }}mm/s</span>
+                            <span>{{ getVibLevel(device.sensor_data.vibration) }}</span>
+                        </div>
+                        <div class="sensor-meter">
+                            <div class="sensor-meter-fill vib-fill" 
+                                 :style="{ width: Math.min(100, device.sensor_data.vibration * 10) + '%' }"></div>
+                        </div>
+                        
+                        <div class="sensor-value">
+                            <span>🔼 压力：{{ device.sensor_data.pressure }}MPa</span>
+                            <span>{{ getPressLevel(device.sensor_data.pressure) }}</span>
+                        </div>
+                        <div class="sensor-meter">
+                            <div class="sensor-meter-fill press-fill" 
+                                 :style="{ width: Math.min(100, (device.sensor_data.pressure - 1) * 20) + '%' }"></div>
+                        </div>
+                        
                         <div v-if="device.status !== '正常'">
-                            <p>故障类型：{{ device.fault_info.type }}</p>
+                            <p>⚠️ 故障：{{ device.fault_info.type }}</p>
+                            <p>📝 描述：{{ device.fault_info.description }}</p>
+                        </div>
+                        
+                        <div class="last-updated">
+                            最后更新：{{ formatTime(device.last_updated) }}
                         </div>
                     </div>
                 </div>
+            </div>
+            
+            <div class="pagination" v-if="filteredDevices.length > itemsPerPage">
+                <button class="page-btn" 
+                        v-for="page in totalPages" 
+                        :key="page"
+                        :class="{ active: currentPage === page }"
+                        @click="currentPage = page">
+                    {{ page }}
+                </button>
             </div>
         </main>
     </div>
@@ -283,221 +291,454 @@
         new Vue({
             el: '#app',
             data: {
-                loading: true,
-                error: null,
                 devices: [],
                 searchKeyword: '',
-                isSimulating: false,
-                simulationProgress: 0,
-                simulationSpeed: 1,
-                historyData: [],
-                simulationInterval: null
+                dataUpdateInterval: null,
+                currentPage: 1,
+                itemsPerPage: 12,
+                deviceTypes: [
+                    '离心泵', '压缩机', '发电机', '冷却塔', '传送带',
+                    '反应釜', '分离器', '换热器', '储罐', '搅拌器',
+                    '风机', '空压机', '干燥机', '过滤器', '粉碎机',
+                    '离心机', '挤出机', '注塑机', '混合机', '包装机',
+                    '输送机', '提升机', '压滤机', '蒸馏塔', '蒸发器',
+                    '冷凝器', '吸收塔', '萃取塔', '反应器', '干燥塔'
+                ],
+                locations: [
+                    'A车间', 'B车间', 'C仓库', 'D区域', 'E生产线',
+                    'F车间', 'G区域', 'H生产线', 'I仓库', 'J实验室',
+                    'K车间', 'L区域', 'M生产线', 'N仓库', 'O实验室',
+                    'P车间', 'Q区域', 'R生产线', 'S仓库', 'T实验室'
+                ]
             },
             computed: {
                 filteredDevices() {
-                    const keyword = this.searchKeyword.toLowerCase();
-                    return this.devices.filter(device => 
-                        (device.device_id || '').toLowerCase().includes(keyword) ||
-                        (device.location || '').toLowerCase().includes(keyword)
-                    );
+                    const keyword = this.searchKeyword.toLowerCase()
+                    const filtered = this.devices.filter(device => 
+                        device.device_id.toLowerCase().includes(keyword) ||
+                        device.location.toLowerCase().includes(keyword) ||
+                        device.device_type.toLowerCase().includes(keyword)
+                    )
+                    
+                    // 重置页码当过滤结果变化时
+                    if (filtered.length <= this.itemsPerPage) {
+                        this.currentPage = 1
+                    }
+                    
+                    return filtered
                 },
-                currentSimulationTime() {
-                    return this.historyData[this.simulationProgress]?.timestamp || '';
+                totalPages() {
+                    return Math.ceil(this.filteredDevices.length / this.itemsPerPage)
+                },
+                paginatedDevices() {
+                    const start = (this.currentPage - 1) * this.itemsPerPage
+                    const end = start + this.itemsPerPage
+                    return this.filteredDevices.slice(start, end)
                 }
             },
-            async mounted() {
-                await this.loadData();
-                this.initHistoryData();
-                window.addEventListener('resize', this.handleResize);
+            mounted() {
+                // 初始加载模拟数据
+                this.devices = this.generateMockDevices()
+                this.init3DModels()
+                window.addEventListener('resize', this.handleResize)
+                
+                // 设置定时更新数据的逻辑
+                this.dataUpdateInterval = setInterval(() => {
+                    this.updateDeviceData()
+                }, 3000) // 每3秒更新一次数据
+            },
+            beforeDestroy() {
+                window.removeEventListener('resize', this.handleResize)
+                this.cleanUp3D()
+                clearInterval(this.dataUpdateInterval)
             },
             methods: {
-                async loadData() {
-                    try {
-                        // 重要修改：根据实际仓库名称修改
-                        const repoName = 'industrial-monitoring'; 
-                        const response = await fetch(`/${repoName}/data/industrial_devices_full.json`);
+                // 生成模拟设备数据
+                generateMockDevices() {
+                    const statuses = ['正常', '警告', '故障']
+                    const faultTypes = [
+                        '过热', '振动过大', '轴承磨损', '润滑不足', '电气故障',
+                        '密封泄漏', '电机故障', '控制系统异常', '管道堵塞', '冷却不足',
+                        '轴偏移', '联轴器损坏', '齿轮磨损', '皮带松弛', '电压不稳'
+                    ]
+                    const descriptions = [
+                        '需要检查', '建议维护', '立即检修', '停机维修', '紧急处理',
+                        '传感器异常', '参数超标', '效率下降', '噪音异常', '振动超标',
+                        '温度过高', '压力异常', '流量不足', '电流波动', '绝缘老化'
+                    ]
+                    
+                    return Array.from({length: 30}, (_, i) => {
+                        const status = statuses[Math.floor(Math.random() * statuses.length)]
+                        const isFault = status === '故障'
                         
-                        if (!response.ok) throw new Error(`请求失败: ${response.status}`);
-                        const rawData = await response.json();
-                        
-                        this.devices = Array.isArray(rawData) ? rawData : rawData.devices;
-                    } catch (error) {
-                        console.error('真实数据加载失败，启用模拟模式:', error);
-                        this.initHistoryData();
-                    } finally {
-                        this.loading = false;
-                    }
-                },
-
-                initHistoryData() {
-                    const baseTime = Date.now();
-                    this.historyData = Array.from({length: 24}, (_, hour) => ({
-                        timestamp: new Date(baseTime - (24 - hour) * 3600000).toLocaleString(),
-                        devices: this.generateHourlyData(hour)
-                    }));
-                    this.devices = this.historyData[0].devices;
-                },
-
-                generateHourlyData(hour) {
-                    return Array.from({length: 6}, (_, i) => ({
-                        id: `SIM-${hour}-${i}`,
-                        device_id: `设备-${String.fromCharCode(65 + i)}`,
-                        status: (hour + i) % 3 === 0 ? '故障' : '正常',
-                        location: `区域-${(i % 3) + 1}`,
-                        device_type: ['CNC机床', '机械臂', '传送带', '检测仪', '包装机', 'AGV'][i],
-                        sensor_data: {
-                            temperature: 30 + Math.sin(hour/3)*10 + i*2,
-                            vibration: 0.1 + Math.random()*0.5
-                        },
-                        fault_info: {
-                            type: (hour % 4 === 0) ? ['过热', '振动异常', '通讯故障'][i%3] : '无'
+                        return {
+                            id: `DEV-${1000 + i}`,
+                            device_id: `设备-${1000 + i}`,
+                            device_type: this.deviceTypes[Math.floor(Math.random() * this.deviceTypes.length)],
+                            location: this.locations[Math.floor(Math.random() * this.locations.length)],
+                            status: status,
+                            sensor_data: {
+                                temperature: Math.round(20 + Math.random() * 30 * 10) / 10,
+                                vibration: Math.round(Math.random() * 10 * 10) / 10,
+                                pressure: Math.round(1 + Math.random() * 5 * 10) / 10,
+                                current: Math.round(5 + Math.random() * 15 * 10) / 10,
+                                flow: Math.round(10 + Math.random() * 90 * 10) / 10
+                            },
+                            fault_info: {
+                                type: isFault ? faultTypes[Math.floor(Math.random() * faultTypes.length)] : null,
+                                description: isFault ? descriptions[Math.floor(Math.random() * descriptions.length)] : '无'
+                            },
+                            last_updated: new Date(),
+                            animate: false
                         }
-                    }));
+                    })
                 },
-
-                toggleSimulation() {
-                    this.isSimulating = !this.isSimulating;
-                    this.isSimulating ? this.startSimulation() : this.stopSimulation();
-                },
-
-                startSimulation() {
-                    this.simulationInterval = setInterval(() => {
-                        this.simulationProgress = (this.simulationProgress + 1) % this.historyData.length;
-                    }, 1000 / this.simulationSpeed);
-                },
-
-                stopSimulation() {
-                    clearInterval(this.simulationInterval);
-                    this.simulationInterval = null;
-                },
-
-                adjustSpeed() {
-                    if (this.isSimulating) {
-                        this.stopSimulation();
-                        this.startSimulation();
-                    }
-                },
-
-                updateDevices() {
-                    const currentData = this.historyData[this.simulationProgress];
-                    this.devices = currentData.devices.map(d => ({
-                        ...d,
-                        modelLoaded: false
-                    }));
-                    this.$nextTick(() => {
-                        this.cleanUp3D();
-                        this.init3DModels();
-                    });
-                },
-
-                init3DModels() {
-                    this.devices.forEach(device => {
-                        const container = this.$refs[`modelContainer${device.id}`]?.[0];
-                        if (container) {
-                            try {
-                                device.threeJS = this.initThreeJS(container, device);
-                                device.modelLoaded = true;
-                            } catch (error) {
-                                console.error('3D模型初始化失败:', error);
-                                container.innerHTML = '<div class="model-error">❌ 模型加载失败</div>';
+                
+                // 更新设备数据
+                updateDeviceData() {
+                    this.devices = this.devices.map(device => {
+                        // 随机决定是否改变状态 (20%概率)
+                        const shouldChangeStatus = Math.random() < 0.2
+                        
+                        // 更新传感器数据
+                        const tempChange = (Math.random() * 2 - 1) * (device.status === '故障' ? 1.5 : 1)
+                        const vibChange = (Math.random() * 0.5 - 0.25) * (device.status === '故障' ? 2 : 1)
+                        const pressChange = (Math.random() * 0.3 - 0.15) * (device.status === '故障' ? 1.5 : 1)
+                        
+                        const newTemp = device.sensor_data.temperature + tempChange
+                        const newVibration = device.sensor_data.vibration + vibChange
+                        const newPressure = device.sensor_data.pressure + pressChange
+                        
+                        // 确保数值在合理范围内
+                        const clampedTemp = Math.max(20, Math.min(60, newTemp))
+                        const clampedVibration = Math.max(0, Math.min(15, newVibration))
+                        const clampedPressure = Math.max(0.5, Math.min(7, newPressure))
+                        
+                        // 创建更新后的设备对象
+                        const updatedDevice = {
+                            ...device,
+                            sensor_data: {
+                                ...device.sensor_data,
+                                temperature: Math.round(clampedTemp * 10) / 10,
+                                vibration: Math.round(clampedVibration * 10) / 10,
+                                pressure: Math.round(clampedPressure * 10) / 10,
+                                current: Math.round((5 + Math.random() * 15) * 10) / 10,
+                                flow: Math.round((10 + Math.random() * 90) * 10) / 10
+                            },
+                            last_updated: new Date(),
+                            animate: false
+                        }
+                        
+                        // 随机改变状态
+                        if (shouldChangeStatus) {
+                            const statuses = ['正常', '警告', '故障']
+                            const faultTypes = [
+                                '过热', '振动过大', '轴承磨损', '润滑不足', '电气故障',
+                                '密封泄漏', '电机故障', '控制系统异常', '管道堵塞', '冷却不足',
+                                '轴偏移', '联轴器损坏', '齿轮磨损', '皮带松弛', '电压不稳'
+                            ]
+                            const descriptions = [
+                                '需要检查', '建议维护', '立即检修', '停机维修', '紧急处理',
+                                '传感器异常', '参数超标', '效率下降', '噪音异常', '振动超标',
+                                '温度过高', '压力异常', '流量不足', '电流波动', '绝缘老化'
+                            ]
+                            
+                            updatedDevice.status = statuses[Math.floor(Math.random() * statuses.length)]
+                            
+                            if (updatedDevice.status === '故障') {
+                                updatedDevice.fault_info = {
+                                    type: faultTypes[Math.floor(Math.random() * faultTypes.length)],
+                                    description: descriptions[Math.floor(Math.random() * descriptions.length)]
+                                }
+                                // 故障设备温度更高
+                                updatedDevice.sensor_data.temperature = Math.round(
+                                    Math.min(60, updatedDevice.sensor_data.temperature + 5 + Math.random() * 5) * 10
+                                ) / 10
+                                // 故障设备振动更大
+                                updatedDevice.sensor_data.vibration = Math.round(
+                                    Math.min(15, updatedDevice.sensor_data.vibration + 3 + Math.random() * 3) * 10
+                                ) / 10
+                            } else {
+                                updatedDevice.fault_info = {
+                                    type: null,
+                                    description: '无'
+                                }
                             }
+                            
+                            // 标记需要动画
+                            updatedDevice.animate = true
+                            
+                            // 更新3D模型颜色
+                            this.updateModelColor(device.id, updatedDevice.status)
                         }
-                    });
+                        
+                        // 温度变化大时也触发动画
+                        if (Math.abs(updatedDevice.sensor_data.temperature - device.sensor_data.temperature) > 3 ||
+                            Math.abs(updatedDevice.sensor_data.vibration - device.sensor_data.vibration) > 1.5 ||
+                            Math.abs(updatedDevice.sensor_data.pressure - device.sensor_data.pressure) > 0.5) {
+                            updatedDevice.animate = true
+                        }
+                        
+                        return updatedDevice
+                    })
+                    
+                    // 清除动画标记
+                    setTimeout(() => {
+                        this.devices.forEach(device => {
+                            if (device.animate) {
+                                device.animate = false
+                            }
+                        })
+                    }, 1500)
+                },
+                
+                // 获取温度等级
+                getTempLevel(temp) {
+                    if (temp < 30) return '正常'
+                    if (temp < 45) return '注意'
+                    return '危险'
+                },
+                
+                // 获取振动等级
+                getVibLevel(vib) {
+                    if (vib < 3) return '正常'
+                    if (vib < 6) return '注意'
+                    return '危险'
+                },
+                
+                // 获取压力等级
+                getPressLevel(press) {
+                    if (press < 2) return '低'
+                    if (press < 5) return '正常'
+                    return '高'
+                },
+                
+                // 计算温度百分比
+                getTempPercentage(temp) {
+                    return Math.min(100, (temp - 20) / 0.4)
+                },
+                
+                // 格式化时间
+                formatTime(date) {
+                    return date.toLocaleTimeString()
+                },
+                
+                init3DModels() {
+                    this.$nextTick(() => {
+                        this.devices.forEach(device => {
+                            const container = this.$refs[`modelContainer${device.id}`]?.[0]
+                            if (container) {
+                                device.threeJS = this.initThreeJS(container, device)
+                            }
+                        })
+                    })
                 },
 
                 initThreeJS(container, device) {
-                    const scene = new THREE.Scene();
+                    // 场景初始化
+                    const scene = new THREE.Scene()
                     const camera = new THREE.PerspectiveCamera(
                         75,
                         container.clientWidth / container.clientHeight,
                         0.1,
                         1000
-                    );
+                    )
                     
+                    // 渲染器配置
                     const renderer = new THREE.WebGLRenderer({ 
                         antialias: true,
                         alpha: true
-                    });
-                    renderer.setSize(container.clientWidth, container.clientHeight);
-                    container.innerHTML = '';
-                    container.appendChild(renderer.domElement);
+                    })
+                    renderer.setSize(container.clientWidth, container.clientHeight)
+                    container.innerHTML = ''
+                    container.appendChild(renderer.domElement)
 
                     // 灯光设置
-                    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-                    scene.add(ambientLight);
-                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
-                    directionalLight.position.set(5, 5, 5);
-                    scene.add(directionalLight);
+                    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+                    scene.add(ambientLight)
+                    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8)
+                    directionalLight.position.set(5, 5, 5)
+                    scene.add(directionalLight)
 
-                    // 创建动态几何体
-                    const geometry = new THREE.BoxGeometry();
-                    const material = new THREE.MeshPhongMaterial({ 
-                        color: device.status === '正常' ? 0x00ff00 : 0xff0000,
+                    // 根据设备类型创建不同几何体
+                    let geometry, material
+                    switch(device.device_type) {
+                        case '离心泵':
+                            geometry = new THREE.CylinderGeometry(0.5, 0.5, 1, 32)
+                            break
+                        case '压缩机':
+                            geometry = new THREE.BoxGeometry(1, 0.6, 0.8)
+                            break
+                        case '发电机':
+                            geometry = new THREE.SphereGeometry(0.6, 32, 32)
+                            break
+                        case '冷却塔':
+                            geometry = new THREE.ConeGeometry(0.6, 1, 32)
+                            break
+                        case '传送带':
+                            geometry = new THREE.BoxGeometry(1.2, 0.3, 0.4)
+                            break
+                        case '反应釜':
+                            geometry = new THREE.SphereGeometry(0.7, 32, 32)
+                            break
+                        case '分离器':
+                            geometry = new THREE.CylinderGeometry(0.6, 0.3, 1, 32)
+                            break
+                        case '储罐':
+                            geometry = new THREE.CylinderGeometry(0.7, 0.7, 0.5, 32)
+                            break
+                        case '搅拌器':
+                            geometry = new THREE.TorusGeometry(0.4, 0.1, 16, 32)
+                            break
+                        case '风机':
+                            geometry = new THREE.ConeGeometry(0.5, 0.8, 32)
+                            break
+                        case '空压机':
+                            geometry = new THREE.BoxGeometry(0.9, 0.7, 0.6)
+                            break
+                        case '干燥机':
+                            geometry = new THREE.CylinderGeometry(0.5, 0.5, 0.8, 32)
+                            break
+                        case '过滤器':
+                            geometry = new THREE.TorusKnotGeometry(0.4, 0.1, 100, 16)
+                            break
+                        case '粉碎机':
+                            geometry = new THREE.OctahedronGeometry(0.6)
+                            break
+                        case '离心机':
+                            geometry = new THREE.CylinderGeometry(0.4, 0.6, 0.7, 32)
+                            break
+                        case '挤出机':
+                            geometry = new THREE.CylinderGeometry(0.3, 0.3, 1.2, 32)
+                            break
+                        case '注塑机':
+                            geometry = new THREE.BoxGeometry(1, 0.8, 0.6)
+                            break
+                        case '混合机':
+                            geometry = new THREE.DodecahedronGeometry(0.6)
+                            break
+                        case '包装机':
+                            geometry = new THREE.BoxGeometry(1.1, 0.5, 0.5)
+                            break
+                        case '输送机':
+                            geometry = new THREE.CylinderGeometry(0.2, 0.2, 1.5, 32)
+                            break
+                        case '提升机':
+                            geometry = new THREE.BoxGeometry(0.5, 1, 0.5)
+                            break
+                        case '压滤机':
+                            geometry = new THREE.BoxGeometry(0.8, 0.4, 0.8)
+                            break
+                        case '蒸馏塔':
+                            geometry = new THREE.CylinderGeometry(0.3, 0.5, 1.5, 32)
+                            break
+                        case '蒸发器':
+                            geometry = new THREE.SphereGeometry(0.6, 32, 32)
+                            break
+                        case '冷凝器':
+                            geometry = new THREE.BoxGeometry(0.7, 0.7, 0.7)
+                            break
+                        case '吸收塔':
+                            geometry = new THREE.CylinderGeometry(0.4, 0.4, 1.2, 32)
+                            break
+                        case '萃取塔':
+                            geometry = new THREE.CylinderGeometry(0.5, 0.3, 1.3, 32)
+                            break
+                        case '反应器':
+                            geometry = new THREE.SphereGeometry(0.8, 32, 32)
+                            break
+                        case '干燥塔':
+                            geometry = new THREE.CylinderGeometry(0.5, 0.2, 1.4, 32)
+                            break
+                        default:
+                            geometry = new THREE.BoxGeometry(0.8, 0.8, 0.8)
+                    }
+
+                    material = new THREE.MeshPhongMaterial({ 
+                        color: device.status === '正常' ? 0x00ff00 : 
+                               device.status === '警告' ? 0xffff00 : 0xff0000,
                         transparent: true,
-                        opacity: 0.8
-                    });
-                    const cube = new THREE.Mesh(geometry, material);
-                    scene.add(cube);
-                    camera.position.z = 3;
+                        opacity: 0.8,
+                        shininess: 100
+                    })
+                    
+                    const mesh = new THREE.Mesh(geometry, material)
+                    scene.add(mesh)
+                    camera.position.z = 2.5
 
-                    // 控制器设置
-                    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-                    controls.enableDamping = true;
-                    controls.dampingFactor = 0.05;
+                    // 控制器配置
+                    const controls = new THREE.OrbitControls(camera, renderer.domElement)
+                    controls.enableDamping = true
+                    controls.dampingFactor = 0.05
+                    controls.maxDistance = 5
+                    controls.minDistance = 1
 
                     // 动画循环
                     function animate() {
-                        requestAnimationFrame(animate);
-                        controls.update();
-                        cube.rotation.x += 0.01;
-                        cube.rotation.y += 0.01;
-                        renderer.render(scene, camera);
+                        requestAnimationFrame(animate)
+                        mesh.rotation.x += 0.005
+                        mesh.rotation.y += 0.01
+                        controls.update()
+                        renderer.render(scene, camera)
                     }
-                    animate();
+                    animate()
 
-                    return { scene, camera, renderer, controls };
+                    return { scene, camera, renderer, controls, mesh }
+                },
+
+                // 更新3D模型颜色
+                updateModelColor(deviceId, status) {
+                    const container = this.$refs[`modelContainer${deviceId}`]?.[0]
+                    if (!container || !container.threeJS) return
+                    
+                    const { mesh } = container.threeJS
+                    mesh.material.color.setHex(
+                        status === '正常' ? 0x00ff00 : 
+                        status === '警告' ? 0xffff00 : 0xff0000
+                    )
                 },
 
                 handleResize() {
                     this.devices.forEach(device => {
                         if (device.threeJS) {
-                            const container = this.$refs[`modelContainer${device.id}`]?.[0];
-                            if (!container) return;
+                            const container = this.$refs[`modelContainer${device.id}`]?.[0]
+                            if (!container) return
                             
-                            const { camera, renderer } = device.threeJS;
-                            camera.aspect = container.clientWidth / container.clientHeight;
-                            camera.updateProjectionMatrix();
-                            renderer.setSize(container.clientWidth, container.clientHeight);
+                            const { camera, renderer } = device.threeJS
+                            camera.aspect = container.clientWidth / container.clientHeight
+                            camera.updateProjectionMatrix()
+                            renderer.setSize(container.clientWidth, container.clientHeight)
                         }
-                    });
+                    })
                 },
 
                 cleanUp3D() {
                     this.devices.forEach(device => {
                         if (device.threeJS) {
-                            const { renderer, controls } = device.threeJS;
-                            renderer.domElement.remove();
-                            controls.dispose();
-                            device.threeJS = null;
+                            const { renderer, controls } = device.threeJS
+                            renderer.domElement.remove()
+                            controls.dispose()
+                            device.threeJS = null
                         }
-                    });
+                    })
                 },
 
                 showDetail(device) {
-                    alert(`设备详情（演示模式）\nID：${device.id}\n状态：${device.status}`);
+                    alert(`设备详情:\n\n` +
+                          `设备ID: ${device.device_id}\n` +
+                          `类型: ${device.device_type}\n` +
+                          `位置: ${device.location}\n` +
+                          `状态: ${device.status}\n\n` +
+                          `传感器数据:\n` +
+                          `温度: ${device.sensor_data.temperature}℃\n` +
+                          `振动: ${device.sensor_data.vibration}mm/s\n` +
+                          `压力: ${device.sensor_data.pressure}MPa\n` +
+                          `电流: ${device.sensor_data.current}A\n` +
+                          `流量: ${device.sensor_data.flow}L/min\n\n` +
+                          `最后更新: ${this.formatTime(device.last_updated)}`)
                 }
-            },
-            watch: {
-                simulationProgress() {
-                    this.updateDevices();
-                }
-            },
-            beforeDestroy() {
-                window.removeEventListener('resize', this.handleResize);
-                this.stopSimulation();
-                this.cleanUp3D();
             }
-        });
+        })
     </script>
 </body>
 </html>
